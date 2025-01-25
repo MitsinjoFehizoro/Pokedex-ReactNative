@@ -17,7 +17,7 @@ export function PokemonCard({ style, id, name }: Props) {
 			source={{ uri: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png` }}
 			height={72} width={72}
 		/>
-		<ThemedText>{name}</ThemedText>
+		<ThemedText style={{ textTransform: 'capitalize' }}>{name}</ThemedText>
 		<View style={[styles.shadow, { backgroundColor: colors.grayBackground }]} />
 	</Card>
 }
