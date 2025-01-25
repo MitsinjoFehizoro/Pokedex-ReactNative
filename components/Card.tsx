@@ -6,11 +6,12 @@ type Props = ViewProps
 
 export function Card({ style, ...rest }: Props) {
 	const colors = useThemeColors()
-	return <View style={[style = { backgroundColor: colors.grayWhite }, styles.container, style]} {...rest} />
+	return <View style={[style, style = { backgroundColor: colors.grayWhite }, styles.container]} {...rest} />
 }
 
 const styles = StyleSheet.create({
 	container: {
-		borderRadius: 8, ...Shadows.dp2
+		borderRadius: 8,
+		...Shadows.dp2
 	}
 })
