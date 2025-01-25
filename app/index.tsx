@@ -1,30 +1,46 @@
 
 import { Card } from "@/components/Card";
 import { PokemonCard } from "@/components/pokemon/PokemonCard";
+import { Row } from "@/components/Row";
+import { SearchBar } from "@/components/SearchBar";
 import { ThemedText } from "@/components/ThemedText";
 import { useAxios } from "@/hooks/useAxios";
 import { useThemeColors } from "@/hooks/useThemeColors";
 import { getPokemonId } from "@/tools/getPokemonId";
-import { useEffect } from "react";
+import { Pokemon } from "@/tools/type";
+import { useEffect, useState } from "react";
 import { ActivityIndicator, FlatList, Image, StatusBar, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+
 
 export default function Index() {
 	const colors = useThemeColors()
 	const { stateAxios, getPokemons } = useAxios()
+	const [pokemons, setPokemons] = useState<Pokemon[]>([])
 	useEffect(() => {
-		getPokemons('/pokemon?limit=50')
+		getPokemons('/pokemon?limit=500')
 	}, [])
-	const pokemons = Array.from({ length: 35 }, (_, k) => ({
-		id: k + 1, name: 'Pokemon name'
-	}))
+	useEffect(() => {
+		if (stateAxios.data) {
+			setPokemons(stateAxios.data.results)
+		}
+	}, [stateAxios.data])
+
+	const [search, setSearch] = useState('')
+	const filteredPokemons = search ? pokemons.filter(p => (p.name.includes(search.toLowerCase()) || getPokemonId(p.url).toString() === search)) : pokemons
+
 	return (
 		<SafeAreaView style={[styles.container, { backgroundColor: colors.tint }]} >
 			<StatusBar barStyle='light-content' backgroundColor={colors.tint} />
+
 			<View style={styles.header}>
-				<Image source={require('@/assets/images/pokeball.png')} width={24} height={24} />
-				<ThemedText variant="headline" color="grayLight">Pokedex</ThemedText>
+				<Row gap={16}>
+					<Image source={require('@/assets/images/pokeball.png')} width={24} height={24} />
+					<ThemedText variant="headline" color="grayLight">Pokedex</ThemedText>
+				</Row>
+				<SearchBar value={search} onChange={setSearch} />
 			</View>
+
 			<Card style={styles.body}>
 				{
 					stateAxios.isLoading && (
@@ -32,7 +48,7 @@ export default function Index() {
 					)
 				}
 				{
-					stateAxios.data && (
+					filteredPokemons && (
 						< FlatList
 							numColumns={3}
 							contentContainerStyle={[styles.gridGap, styles.list]}
@@ -40,8 +56,8 @@ export default function Index() {
 							ListFooterComponent={ //Mila amboarina infinite projet reel
 								stateAxios.isLoading ? <ActivityIndicator color={colors.tint} /> : null
 							}
-							data={stateAxios.data.results} renderItem={({ item }) =>
-								<PokemonCard style={{ flex: 1 / 3 }} id={getPokemonId(item.url)} name={item.name} />
+							data={filteredPokemons} renderItem={({ item }) =>
+								<PokemonCard style={{ flex: 1 / 3 }} pokemon={item} />
 							} />
 					)
 				}
@@ -56,9 +72,6 @@ const styles = StyleSheet.create({
 		padding: 8
 	},
 	header: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		gap: 16,
 		padding: 12
 	},
 	body: {
