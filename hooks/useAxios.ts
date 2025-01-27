@@ -24,6 +24,7 @@ export function useAxios() {
 			setStateAxios({ data: null, isLoading: false, errorMessage: errorMessage })
 		}
 	}
+
 	return {
 		stateAxios, getPokemons
 	}

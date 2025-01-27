@@ -9,17 +9,25 @@ type Props = ViewProps & {
 export function SearchBar({ style, value, onChange, ...rest }: Props) {
 	const colors = useThemeColors()
 	return (
-		<Row style={[styles.container, {backgroundColor : colors.grayWhite}]} gap={4}>
+		<Row style={[styles.container, { backgroundColor: colors.grayWhite }]} gap={4}>
 			<Image
 				source={require('@/assets/images/search.png')}
+				style={{ width: 18, height: 18 }}
 			/>
-			<TextInput style={styles.input} value={value} onChangeText={onChange} />
+			<TextInput
+				style={styles.input}
+				value={value}
+				onChangeText={onChange}
+				placeholder="Search..."
+				placeholderTextColor={colors.grayMedium}
+			/>
 		</Row>
 	)
 }
 
 const styles = StyleSheet.create({
 	container: {
+		flex: 1,
 		borderRadius: 50,
 		height: 36,
 		paddingHorizontal: 12,

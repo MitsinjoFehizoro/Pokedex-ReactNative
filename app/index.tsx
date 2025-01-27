@@ -1,8 +1,10 @@
 
 import { Card } from "@/components/Card";
+import { CustomSafeAreaView } from "@/components/CustomSafeAreaView";
 import { PokemonCard } from "@/components/pokemon/PokemonCard";
 import { Row } from "@/components/Row";
 import { SearchBar } from "@/components/SearchBar";
+import { SortButton } from "@/components/SortButton";
 import { ThemedText } from "@/components/ThemedText";
 import { useAxios } from "@/hooks/useAxios";
 import { useThemeColors } from "@/hooks/useThemeColors";
@@ -18,19 +20,18 @@ export default function Index() {
 	const { stateAxios, getPokemons } = useAxios()
 	const [pokemons, setPokemons] = useState<Pokemon[]>([])
 	useEffect(() => {
-		getPokemons('/pokemon?limit=500')
+		getPokemons('/pokemon?limit=20')
 	}, [])
 	useEffect(() => {
-		if (stateAxios.data) {
-			setPokemons(stateAxios.data.results)
-		}
+		if (stateAxios.data) setPokemons(stateAxios.data.results)
 	}, [stateAxios.data])
 
+	const [sortKey, setSortKey] = useState<'id' | 'name'>('id')
 	const [search, setSearch] = useState('')
-	const filteredPokemons = search ? pokemons.filter(p => (p.name.includes(search.toLowerCase()) || getPokemonId(p.url).toString() === search)) : pokemons
+	const filteredPokemons = (search ? pokemons.filter(p => (p.name.includes(search.toLowerCase()) || getPokemonId(p.url).toString() === search)) : pokemons).sort((a, b) => sortKey == 'name' ? a.name.localeCompare(b.name) : getPokemonId(a.url) - getPokemonId(b.url))
 
 	return (
-		<SafeAreaView style={[styles.container, { backgroundColor: colors.tint }]} >
+		<CustomSafeAreaView style={{ backgroundColor: colors.tint }} >
 			<StatusBar barStyle='light-content' backgroundColor={colors.tint} />
 
 			<View style={styles.header}>
@@ -38,7 +39,10 @@ export default function Index() {
 					<Image source={require('@/assets/images/pokeball.png')} width={24} height={24} />
 					<ThemedText variant="headline" color="grayLight">Pokedex</ThemedText>
 				</Row>
-				<SearchBar value={search} onChange={setSearch} />
+				<Row gap={16}>
+					<SearchBar value={search} onChange={setSearch} />
+					<SortButton value={sortKey} onChange={setSortKey} />
+				</Row>
 			</View>
 
 			<Card style={styles.body}>
@@ -62,17 +66,14 @@ export default function Index() {
 					)
 				}
 			</Card>
-		</SafeAreaView>
+		</CustomSafeAreaView>
 	);
 }
 
 const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		padding: 8
-	},
 	header: {
-		padding: 12
+		paddingHorizontal: 12,
+		paddingBottom: 0
 	},
 	body: {
 		flex: 1
