@@ -1,3 +1,4 @@
+import { PokemonSpec } from '@/components/pokemon/PokemonSpec';
 import { Colors } from "@/constants/Colors"
 
 export type Pokemon = {
@@ -14,4 +15,9 @@ export type PokemonDetail = {
 	stats: { base_stat: number, stat: { name: string } }[],
 	cries: { latest: { name: string } },
 	types: { type: { name: keyof typeof Colors.type } }[],
+}
+export type PokemonFlavorText = {
+	flavor_text_entries: {
+		flavor_text: string
+	}[]
 }

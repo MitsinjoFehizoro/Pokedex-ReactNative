@@ -10,7 +10,7 @@ type Props = ViewProps & {
 }
 export function PokemonSpec({ style, icon, value, title, ...rest }: Props) {
 	return <View style={[style, styles.container]} {...rest}>
-		<Row style={{ height: 36 }} gap={8}>
+		<Row style={{ height: 32 }} gap={8}>
 			{icon && <Image source={icon.src} style={{ width: icon.width, height: 16 }} />}
 			<ThemedText variant='body3' color='grayDark'>{value}</ThemedText>
 		</Row>

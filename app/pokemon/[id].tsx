@@ -1,16 +1,17 @@
 import { Card } from "@/components/Card";
 import { CustomSafeAreaView } from "@/components/CustomSafeAreaView";
 import { PokemonSpec } from "@/components/pokemon/PokemonSpec";
+import { PokemonStat } from "@/components/pokemon/PokemonStat";
 import { PokemonType } from "@/components/pokemon/PokemonType";
 import { Row } from "@/components/Row";
 import { ThemedText } from "@/components/ThemedText";
 import { Colors } from "@/constants/Colors";
 import { useAxios } from "@/hooks/useAxios";
 import { useThemeColors } from "@/hooks/useThemeColors";
-import { Pokemon, PokemonDetail } from "@/tools/type";
+import { Pokemon, PokemonDetail, PokemonFlavorText } from "@/tools/type";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
-import { Image, StyleSheet } from "react-native";
+import { ActivityIndicator, Image, StatusBar, StyleSheet } from "react-native";
 import { Text, useColorScheme, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -18,10 +19,12 @@ export default function PokemonScreen() {
 	const colors = useThemeColors()
 	const params = useLocalSearchParams()
 	const [pokemon, setPokemon] = useState<PokemonDetail | null>(null)
-	const { stateAxios, getPokemons } = useAxios()
+	const [flavorText, setFlavorText] = useState<PokemonFlavorText | null>(null)
+	const { stateAxios, getPokemons, stateAxiosFlavorText, getPokemonFlavorText } = useAxios()
 	const [primaryColor, setPrimaryColor] = useState<keyof typeof Colors['type'] | typeof colors.tint>(colors.tint)
 	useEffect(() => {
 		getPokemons(`/pokemon/${params.id}`)
+		getPokemonFlavorText(`/pokemon-species/${params.id}`)
 	}, [])
 	useEffect(() => {
 		if (stateAxios.data) setPokemon(stateAxios.data)
@@ -29,10 +32,23 @@ export default function PokemonScreen() {
 	useEffect(() => {
 		if (pokemon) setPrimaryColor(Colors['type'][pokemon.types[0].type.name])
 	}, [pokemon])
-	return <CustomSafeAreaView style={{ backgroundColor: primaryColor }}>
+	useEffect(() => {
+		if (stateAxiosFlavorText.data) setFlavorText(stateAxiosFlavorText.data)
+	}, [stateAxiosFlavorText])
+
+	return <>
 		{
-			pokemon && (
-				<>
+			stateAxios.isLoading && stateAxiosFlavorText.isLoading && (
+				<CustomSafeAreaView style={{ flex: 1, justifyContent: "center" }}>
+					<ActivityIndicator color={colors.tint} />
+				</CustomSafeAreaView>
+
+			)
+		}
+		{
+			pokemon && flavorText && (
+				<CustomSafeAreaView style={{ backgroundColor: primaryColor }}>
+					<StatusBar barStyle='light-content' backgroundColor={primaryColor} />
 					<Row style={styles.header}>
 						<Row gap={8}>
 							<Image
@@ -56,7 +72,9 @@ export default function PokemonScreen() {
 						<Row style={{ justifyContent: 'center' }} gap={16}>
 							{pokemon.types.map(t => <PokemonType name={t.type.name} key={t.type.name} />)}
 						</Row>
-						<ThemedText variant='subtitle1' color='grayDark' style={{ color: primaryColor }}>About</ThemedText>
+
+						{/* About */}
+						<ThemedText variant='subtitle1' color='grayDark' style={{ color: primaryColor, marginTop: 12 }}>About</ThemedText>
 						<Row>
 							<PokemonSpec
 								icon={{ src: require('@/assets/images/weight.png'), width: 14 }}
@@ -74,15 +92,30 @@ export default function PokemonScreen() {
 								}}
 							/>
 							<PokemonSpec
-								value={pokemon.moves.slice(0, 2).map(m => m.move.name).join('/n')}
+								value={pokemon.moves.slice(0, 2).map(m => m.move.name).join('\n')}
 								title='moves'
 							/>
 						</Row>
+
+						{/* Flavour */}
+						<ThemedText style={{ paddingVertical: 16 }}>
+							{flavorText.flavor_text_entries[0].flavor_text.replaceAll('\n', '. ')}
+						</ThemedText>
+
+						{/* Base stats */}
+						<ThemedText variant='subtitle1' color='grayDark' style={{ color: primaryColor }}>Base stats</ThemedText>
+						<View style={{ alignSelf: 'stretch', paddingHorizontal: 8 }}>
+							{
+								pokemon.stats.map(stat =>
+									<PokemonStat key={stat.stat.name} stat={stat} color={primaryColor} />
+								)
+							}
+						</View>
 					</Card>
-				</>
+				</CustomSafeAreaView>
 			)
 		}
-	</CustomSafeAreaView>
+	</>
 }
 
 const styles = StyleSheet.create({
@@ -92,9 +125,10 @@ const styles = StyleSheet.create({
 		alignItems: 'center'
 	},
 	card: {
-		flex: 1,
 		alignItems: 'center',
-		gap: 16
+		gap: 16,
+		paddingHorizontal: 20,
+		paddingBottom: 44
 	},
 	pockeball: {
 		width: 208,

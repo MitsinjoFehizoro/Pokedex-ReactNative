@@ -17,7 +17,7 @@ export function useAxios() {
 	const getPokemons = async (path: string) => {
 		try {
 			setStateAxios({ data: null, isLoading: true, errorMessage: '' })
-			const response = await axios.get(base_url+path)
+			const response = await axios.get(base_url + path)
 			setStateAxios({ data: response.data, isLoading: false, errorMessage: '' })
 		} catch (error) {
 			let errorMessage = "Une erreur se produite."
@@ -25,7 +25,24 @@ export function useAxios() {
 		}
 	}
 
+	const [stateAxiosFlavorText, setStateAxiosFlavorText] = useState<stateAxios>({
+		data: null,
+		isLoading: false,
+		errorMessage: ''
+	})
+
+	const getPokemonFlavorText = async (path: string) => {
+		try {
+			setStateAxiosFlavorText({ data: null, isLoading: true, errorMessage: '' })
+			const response = await axios.get(base_url + path)
+			setStateAxiosFlavorText({ data: response.data, isLoading: false, errorMessage: '' })
+		} catch (error) {
+			let errorMessage = "Une erreur se produite."
+			setStateAxiosFlavorText({ data: null, isLoading: false, errorMessage: errorMessage })
+		}
+	}
+
 	return {
-		stateAxios, getPokemons
+		stateAxios, getPokemons, stateAxiosFlavorText, getPokemonFlavorText
 	}
 }
