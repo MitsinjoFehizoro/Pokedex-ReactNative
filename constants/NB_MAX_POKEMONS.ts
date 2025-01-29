@@ -1,0 +1,1 @@
+export const NB_MAX_POKEMONS = 21

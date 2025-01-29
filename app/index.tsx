@@ -6,6 +6,7 @@ import { Row } from "@/components/Row";
 import { SearchBar } from "@/components/SearchBar";
 import { SortButton } from "@/components/SortButton";
 import { ThemedText } from "@/components/ThemedText";
+import { NB_MAX_POKEMONS } from "@/constants/NB_MAX_POKEMONS";
 import { useAxios } from "@/hooks/useAxios";
 import { useThemeColors } from "@/hooks/useThemeColors";
 import { getPokemonId } from "@/tools/getPokemonId";
@@ -14,13 +15,12 @@ import { useEffect, useState } from "react";
 import { ActivityIndicator, FlatList, Image, StatusBar, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-
 export default function Index() {
 	const colors = useThemeColors()
 	const { stateAxios, getPokemons } = useAxios()
 	const [pokemons, setPokemons] = useState<Pokemon[]>([])
 	useEffect(() => {
-		getPokemons('/pokemon?limit=20')
+		getPokemons(`/pokemon?limit=${NB_MAX_POKEMONS}`)
 	}, [])
 	useEffect(() => {
 		if (stateAxios.data) setPokemons(stateAxios.data.results)

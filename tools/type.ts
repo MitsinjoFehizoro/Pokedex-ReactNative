@@ -13,7 +13,7 @@ export type PokemonDetail = {
 	height: number,
 	moves: { move: { name: string } }[],
 	stats: { base_stat: number, stat: { name: string } }[],
-	cries: { latest: { name: string } },
+	cries: { latest: string },
 	types: { type: { name: keyof typeof Colors.type } }[],
 }
 export type PokemonFlavorText = {

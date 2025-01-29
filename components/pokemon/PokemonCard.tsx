@@ -9,7 +9,7 @@ import { getPokemonId } from "@/tools/getPokemonId"
 
 type Props = {
 	style?: ViewStyle,
-	pokemon: Pokemon
+	pokemon: Pokemon,
 }
 export function PokemonCard({ style, pokemon }: Props) {
 	const colors = useThemeColors()
